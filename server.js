@@ -34,7 +34,7 @@ app.use(cors({
 app.use(express.json());
 
 // OpenAI API Key
-const OPENAI_API_KEY = `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`
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 ;
 
 // Handle preflight requests
