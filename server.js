@@ -8,6 +8,10 @@ const PORT = 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(cors({
+    origin: 'https://67badfaad5879dc6ae5ba907--ur-bee-loved.netlify.app',
+}));
+
 
 // OpenAI API Key (lembra de usar ``)
 const OPENAI_API_KEY = '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';
