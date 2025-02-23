@@ -15,13 +15,29 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Middleware
+const allowedOrigins = [
+    'https://ur-bee-loved.netlify.app', // Production frontend
+    'http://127.0.0.1:5500', // Local development
+];
+
 app.use(cors({
-    origin: 'https://ur-bee-loved.netlify.app',
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'OPTIONS'], // Allow these HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
 }));
 app.use(express.json());
 
 // OpenAI API Key
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+// Handle preflight requests
+app.options('/chat', cors()); // Enable CORS for preflight requests
 
 // OpenAI API endpoint
 app.post('/chat', async (req, res) => {
