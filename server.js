@@ -16,7 +16,7 @@ app.use(limiter);
 
 // Middleware
 app.use(cors({
-    origin: 'https://67badfaad5879dc6ae5ba907--ur-bee-loved.netlify.app',
+    origin: 'https://chatbot-71v4.onrender.com/chat',
 }));
 app.use(express.json());
 
