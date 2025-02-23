@@ -1,20 +1,27 @@
+require('dotenv').config(); // Load environment variables
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
 
 // Middleware
-app.use(cors());
-app.use(express.json());
 app.use(cors({
     origin: 'https://67badfaad5879dc6ae5ba907--ur-bee-loved.netlify.app',
 }));
+app.use(express.json());
 
-
-// OpenAI API Key (lembra de usar ``)
-const OPENAI_API_KEY = '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';
+// OpenAI API Key
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 // OpenAI API endpoint
 app.post('/chat', async (req, res) => {
@@ -43,11 +50,14 @@ app.post('/chat', async (req, res) => {
         res.json({ reply });
     } catch (error) {
         console.error('Error calling OpenAI API:', error.response ? error.response.data : error.message); // Debug
-        res.status(500).json({ error: 'Failed to get response from AI' });
+        res.status(500).json({ 
+            error: 'Failed to get response from AI',
+            details: error.response ? error.response.data : error.message,
+        });
     }
 });
 
-// ligar o server
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
