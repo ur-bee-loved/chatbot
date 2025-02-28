@@ -31,11 +31,8 @@ app.get('/ping', (req, res) => {
     app.use(cors({
     origin: '*',  // Allow all origins temporarily
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
-        methods: ['GET', 'POST', 'OPTIONS'], // Allow these HTTP methods
-        allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
-    }));
     app.use(express.json());
 
     // OpenAI API Key
