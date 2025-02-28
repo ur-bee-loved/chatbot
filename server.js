@@ -14,6 +14,11 @@
     });
     app.use(limiter);
 
+// debgu ping merda
+app.get('/ping', (req, res) => {
+  res.send('pong');
+});
+
     //RESOLVeNDO A PORRA DO CORS//
     const allowedOrigins = [
         'https://eumeremexomuito.netlify.app', // With https
