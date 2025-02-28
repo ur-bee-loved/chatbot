@@ -24,13 +24,10 @@
     ];
 
     app.use(cors({
-        origin: function (origin, callback) {
-            if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error('Not allowed by CORS'));
-            }
-        },
+    origin: '*',  // Allow all origins temporarily
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
         methods: ['GET', 'POST', 'OPTIONS'], // Allow these HTTP methods
         allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
     }));
