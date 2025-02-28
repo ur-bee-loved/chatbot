@@ -14,36 +14,44 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// debgu ping merda
+// Debug ping endpoint
 app.get('/ping', (req, res) => {
-res.send('pong');
+    res.send('pong');
 });
 
-//RESOLVeNDO A PORRA DO CORS//
+// CORS configuration
 const allowedOrigins = [
-    'https://eumeremexomuito.netlify.app', // With https
-    'http://eumeremexomuito.netlify.app',  // With http
-    'eumeremexomuito.netlify.app',         // Without protocol
-    'http://127.0.0.1:5500',               // Local development
-    'http://localhost:5500'                // Also include localhost
+    'https://eumeremexomuito.netlify.app',
+    'http://eumeremexomuito.netlify.app',
+    'eumeremexomuito.netlify.app',
+    'http://127.0.0.1:5500',
+    'http://localhost:5500'
 ];
 
 app.use(cors({
-origin: '*',  // Allow all origins temporarily
-methods: ['GET', 'POST', 'OPTIONS'],
-allowedHeaders: ['Content-Type', 'Authorization']
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('netlify.app')) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Important: Make sure to correctly parse JSON bodies
 app.use(express.json());
 
-// OpenAI API Key
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY
-;
-
 // Handle preflight requests
-app.options('/chat', cors()); // Enable CORS for preflight requests
+app.options('/chat', cors());
 
 app.post('/chat', async (req, res) => {
     console.log('📩 Chat endpoint hit!');
+    console.log('Request body:', req.body);
     
     // Check if request body exists
     if (!req.body) {
@@ -51,7 +59,7 @@ app.post('/chat', async (req, res) => {
         return res.status(400).json({ error: 'No request body received' });
     }
     
-    const { message } = req.body;
+    const message = req.body.message;
     
     // Check if message exists
     if (!message) {
@@ -126,6 +134,7 @@ app.post('/chat', async (req, res) => {
         });
     }
 });
+
 // Start the server
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
