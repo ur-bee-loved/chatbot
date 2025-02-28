@@ -16,7 +16,7 @@ app.use(limiter);
 
 // Middleware
 const allowedOrigins = [
-    'https://ur-bee-loved.netlify.app', // Production frontend
+    'eumeremexomuito.netlify.app', // Production frontend
     'http://127.0.0.1:5500', // Local development
 ];
 
