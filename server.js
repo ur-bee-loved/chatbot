@@ -14,44 +14,36 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Debug ping endpoint
+// debgu ping merda
 app.get('/ping', (req, res) => {
-    res.send('pong');
+res.send('pong');
 });
 
-// CORS configuration
+//RESOLVeNDO A PORRA DO CORS//
 const allowedOrigins = [
-    'https://eumeremexomuito.netlify.app',
-    'http://eumeremexomuito.netlify.app',
-    'eumeremexomuito.netlify.app',
-    'http://127.0.0.1:5500',
-    'http://localhost:5500'
+    'https://eumeremexomuito.netlify.app', // With https
+    'http://eumeremexomuito.netlify.app',  // With http
+    'eumeremexomuito.netlify.app',         // Without protocol
+    'http://127.0.0.1:5500',               // Local development
+    'http://localhost:5500'                // Also include localhost
 ];
 
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('netlify.app')) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+origin: '*',  // Allow all origins temporarily
+methods: ['GET', 'POST', 'OPTIONS'],
+allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-// Important: Make sure to correctly parse JSON bodies
 app.use(express.json());
 
+// OpenAI API Key
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+;
+
 // Handle preflight requests
-app.options('/chat', cors());
+app.options('/chat', cors()); // Enable CORS for preflight requests
 
 app.post('/chat', async (req, res) => {
     console.log('📩 Chat endpoint hit!');
-    console.log('Request body:', req.body);
     
     // Check if request body exists
     if (!req.body) {
@@ -59,7 +51,7 @@ app.post('/chat', async (req, res) => {
         return res.status(400).json({ error: 'No request body received' });
     }
     
-    const message = req.body.message;
+    const { message } = req.body;
     
     // Check if message exists
     if (!message) {
@@ -74,24 +66,24 @@ app.post('/chat', async (req, res) => {
         console.log('🔄 Calling OpenAI API...');
         
         // Check if API key exists
-        if (!OPENAI_API_KEY){
+        if (!OPENAI_API_KEY) {
             console.error('❌ OpenAI API key is missing');
             return res.status(500).json({ error: 'API key configuration issue' });
         }
         
         const startTime = Date.now();
         const response = await axios.post(
-            'https://api.openai.com/v1/chat/completions';
+            'https://api.openai.com/v1/chat/completions',
             {
-                model: 'gpt-3.5-turbo';
-                messages: [{ role: 'user', content: message }];
-                max_tokens: 500;
-            };
+                model: 'gpt-3.5-turbo', 
+                messages: [{ role: 'user', content: message }],
+                max_tokens: 500
+            },
             {
                 headers: {
-                    'Authorization': `Bearer ${OPENAI_API_KEY}`;
-                    'Content-Type': 'application/json';
-                };
+                    'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                    'Content-Type': 'application/json',
+                },
                 timeout: 25000 // 25 second timeout
             }
         );
@@ -134,7 +126,6 @@ app.post('/chat', async (req, res) => {
         });
     }
 });
-
 // Start the server
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
